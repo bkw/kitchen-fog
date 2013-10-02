@@ -17,6 +17,6 @@
 # limitations under the License.
 
 require 'rspec'
-require_relative '../lib/kitchen/driver/openstack'
+require_relative '../lib/kitchen/driver/fog'
 
 # vim: ai et ts=2 sts=2 sw=2 ft=ruby

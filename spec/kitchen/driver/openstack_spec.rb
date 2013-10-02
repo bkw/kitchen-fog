@@ -22,7 +22,7 @@ require 'rspec'
 require 'kitchen'
 require_relative '../../spec_helper'
 
-describe Kitchen::Driver::Openstack do
+describe Kitchen::Driver::Fog do
   let(:logged_output) { StringIO.new }
   let(:logger) { Logger.new(logged_output) }
   let(:config) { Hash.new }
@@ -33,7 +33,7 @@ describe Kitchen::Driver::Openstack do
   end
 
   let(:driver) do
-    d = Kitchen::Driver::Openstack.new(config)
+    d = Kitchen::Driver::Fog.new(config)
     d.instance = instance
     d
   end
@@ -102,7 +102,7 @@ describe Kitchen::Driver::Openstack do
         :public_ip_addresses => %w{1.2.3.4})
     end
     let(:driver) do
-      d = Kitchen::Driver::Openstack.new(config)
+      d = Kitchen::Driver::Fog.new(config)
       d.instance = instance
       d.stub(:generate_name).with('potatoes').and_return('a_monkey!')
       d.stub(:create_server).and_return(server)
@@ -162,7 +162,7 @@ describe Kitchen::Driver::Openstack do
     let(:compute) { double(:servers => servers) }
 
     let(:driver) do
-      d = Kitchen::Driver::Openstack.new(config)
+      d = Kitchen::Driver::Fog.new(config)
       d.instance = instance
       d.stub(:compute).and_return(compute)
       d
@@ -200,7 +200,7 @@ describe Kitchen::Driver::Openstack do
       end
       let(:compute) { double(:servers => servers) }
       let(:driver) do
-        d = Kitchen::Driver::Openstack.new(config)
+        d = Kitchen::Driver::Fog.new(config)
         d.instance = instance
         d.stub(:compute).and_return(compute)
         d
@@ -275,7 +275,7 @@ describe Kitchen::Driver::Openstack do
     end
     let(:compute) { double(:servers => servers) }
     let(:driver) do
-      d = Kitchen::Driver::Openstack.new(config)
+      d = Kitchen::Driver::Fog.new(config)
       d.instance = instance
       d.stub(:compute).and_return(compute)
       d
@@ -352,7 +352,7 @@ describe Kitchen::Driver::Openstack do
     let(:private_ip_addresses) { nil }
     let(:parsed_ips) { [[], []] }
     let(:driver) do
-      d = Kitchen::Driver::Openstack.new(config)
+      d = Kitchen::Driver::Fog.new(config)
       d.instance = instance
       d.stub(:parse_ips).and_return(parsed_ips)
       d
@@ -407,7 +407,7 @@ describe Kitchen::Driver::Openstack do
       end
     end
 
-    context 'an OpenStack deployment without the floating IP extension' do
+    context 'an Fog deployment without the floating IP extension' do
       let(:server) do
         s = double('server')
         s.stub(:addresses).and_return(addresses)

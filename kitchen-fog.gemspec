@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'kitchen/driver/openstack_version'
+require 'kitchen/driver/fog_version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'kitchen-openstack'
-  spec.version       = Kitchen::Driver::OPENSTACK_VERSION
+  spec.name          = 'kitchen-fog'
+  spec.version       = Kitchen::Driver::FOG_VERSION
   spec.authors       = ['Jonathan Hartman']
   spec.email         = ['j@p4nt5.com']
-  spec.description   = %q{A Test Kitchen OpenStack Nova driver}
+  spec.description   = %q{A Test Kitchen Fog Nova driver}
   spec.summary       = spec.description
-  spec.homepage      = 'https://github.com/RoboticCheese/kitchen-openstack'
+  spec.homepage      = 'https://github.com/TerryHowe/kitchen-fog'
   spec.license       = 'Apache'
 
   spec.files         = `git ls-files`.split($/)

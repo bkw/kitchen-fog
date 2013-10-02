@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/RoboticCheese/kitchen-openstack.png?branch=master)](https://travis-ci.org/RoboticCheese/kitchen-openstack) [![Code Climate](https://codeclimate.com/github/RoboticCheese/kitchen-openstack.png)](https://codeclimate.com/github/RoboticCheese/kitchen-openstack)
+[![Build Status](https://travis-ci.org/TerryHowe/kitchen-fog.png?branch=master)](https://travis-ci.org/TerryHowe/kitchen-fog) [![Code Climate](https://codeclimate.com/github/TerryHowe/kitchen-fog.png)](https://codeclimate.com/github/TerryHowe/kitchen-fog)
 
 # Kitchen::Fog
 
@@ -60,7 +60,7 @@ public\_key\_path that is specified.
     disable_ssl_validation: true
 
 Only disable SSL cert validation if you absolutely know what you are doing,
-but are stuck with an OpenStack deployment without valid SSL certs.
+but are stuck with a deployment without valid SSL certs.
 
 ## Contributing
 

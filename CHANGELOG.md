@@ -1,4 +1,8 @@
-# ?.?.? / ????-??-??
+# 0.2.0 / 2013-10-02
+
+### New Features
+
+* Generalize kitchen-openstack to work with other providers
 
 ### Improvements
 
