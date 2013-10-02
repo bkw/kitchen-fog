@@ -34,10 +34,7 @@ module Kitchen
       default_config :username, 'root'
       default_config :port, '22'
       default_config :use_ipv6, false
-      default_config :openstack_tenant, nil
-      default_config :openstack_region, nil
-      default_config :openstack_service_name, nil
-      default_config :openstack_network_name, nil
+      default_config :network_name, nil
 
       def create(state)
         config[:name] ||= generate_name(instance.name)
@@ -69,31 +66,12 @@ module Kitchen
       private
 
       def compute
-        server_def = {
-          :provider           => 'OpenStack',
-          :openstack_username => config[:openstack_username],
-          :openstack_api_key  => config[:openstack_api_key],
-          :openstack_auth_url => config[:openstack_auth_url]
-        }
-        optional = [
-          :openstack_tenant, :openstack_region, :openstack_service_name
-        ]
-        optional.each do |o|
-          config[o] and server_def[o] = config[o]
-        end
-        Fog::Compute.new(server_def)
+        Fog::Compute.new(config[:authentication].dup)
       end
 
       def create_server
-        server_def = {
-          :name => config[:name],
-          :image_ref => config[:image_ref],
-          :flavor_ref => config[:flavor_ref]
-        }
-        if config[:public_key_path]
-          server_def[:public_key_path] = config[:public_key_path]
-        end
-        server_def[:key_name] = config[:key_name] if config[:key_name]
+        server_def = config[:server_create].dup
+        server_def[:name] = config[:name]
         # Can't use the Fog bootstrap and/or setup methods here; they require a
         # public IP address that can't be guaranteed to exist across all
         # OpenStack deployments (e.g. TryStack ARM only has private IPs).
@@ -122,9 +100,9 @@ module Kitchen
       end
 
       def get_ip(server)
-        if config[:openstack_network_name]
-          debug "Using configured network: #{config[:openstack_network_name]}"
-          return server.addresses[config[:openstack_network_name]].first['addr']
+        if config[:network_name]
+          debug "Using configured network: #{config[:network_name]}"
+          return server.addresses[config[:network_name]].first['addr']
         end
         begin
           pub, priv = server.public_ip_addresses, server.private_ip_addresses
