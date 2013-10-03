@@ -48,7 +48,7 @@ module Kitchen
         unless config[:ssh_key] or config[:key_name]
           do_ssh_setup(state, config, server)
         end
-      rescue Fog::Errors::Error, Excon::Errors::Error => ex
+      rescue ::Fog::Errors::Error, Excon::Errors::Error => ex
         raise ActionFailed, ex.message
       end
 
@@ -66,7 +66,7 @@ module Kitchen
       private
 
       def compute
-        Fog::Compute.new(config[:authentication].dup)
+        ::Fog::Compute.new(config[:authentication].dup)
       end
 
       def create_server
@@ -127,7 +127,7 @@ module Kitchen
       end
 
       def do_ssh_setup(state, config, server)
-        ssh = Fog::SSH.new(state[:hostname], config[:username],
+        ssh = ::Fog::SSH.new(state[:hostname], config[:username],
           { :password => server.password })
         pub_key = open(config[:public_key_path]).read
         ssh.run([
