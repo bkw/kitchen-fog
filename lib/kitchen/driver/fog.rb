@@ -43,7 +43,16 @@ module Kitchen
         state[:server_id] = server.id
         info "Fog instance <#{state[:server_id]}> created."
         server.wait_for { print '.'; ready? } ; puts "\n(server ready)"
-        state[:hostname] = get_ip(server)
+        unless config[:floating_ip_create].nil?
+          hsh = config[:floating_ip_create].dup
+          floater = network.create_floating_ip(hsh[:floating_network_id], hsh)
+          floating_id = floater.body['floatingip']['id']
+          state[:hostname] = floater.body['floatingip']['floating_ip_address']
+          port = network.ports(:filters => {:device_id => server.id.to_s}).first
+          resp = network.associate_floating_ip(floating_id, port.id)
+        else
+          state[:hostname] = get_ip(server)
+        end
         wait_for_sshd(state[:hostname]) ; puts '(ssh ready)'
         unless config[:ssh_key] or config[:key_name]
           do_ssh_setup(state, config, server)
@@ -67,6 +76,12 @@ module Kitchen
 
       def compute
         ::Fog::Compute.new(config[:authentication].dup)
+      end
+
+      def network
+        authentication = config[:authentication].dup
+        authentication.delete(:version)
+        ::Fog::Network.new(authentication)
       end
 
       def create_server
