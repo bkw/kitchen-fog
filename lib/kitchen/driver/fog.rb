@@ -40,16 +40,8 @@ module Kitchen
         config[:name] ||= generate_name(instance.name)
         config[:disable_ssl_validation] and disable_ssl_validation
         server = create_server
-        state[:server_id] = server.id
-        info "Fog instance <#{state[:server_id]}> created."
-        server.wait_for { print '.'; ready? } ; puts "\n(server ready)"
         unless config[:floating_ip_create].nil?
-          hsh = config[:floating_ip_create].dup
-          floater = network.create_floating_ip(hsh[:floating_network_id], hsh)
-          floating_id = floater.body['floatingip']['id']
-          state[:hostname] = floater.body['floatingip']['floating_ip_address']
-          port = network.ports(:filters => {:device_id => server.id.to_s}).first
-          resp = network.associate_floating_ip(floating_id, port.id)
+          create_floating_ip(server)
         else
           state[:hostname] = get_ip(server)
         end
@@ -90,7 +82,20 @@ module Kitchen
         # Can't use the Fog bootstrap and/or setup methods here; they require a
         # public IP address that can't be guaranteed to exist across all
         # OpenStack deployments (e.g. TryStack ARM only has private IPs).
-        compute.servers.create(server_def)
+        server = compute.servers.create(server_def)
+        state[:server_id] = server.id
+        info "Fog instance <#{state[:server_id]}> created."
+        server.wait_for { print '.'; ready? } ; puts "\n(server ready)"
+        server
+      end
+
+      def create_floating_ip(server)
+        hsh = config[:floating_ip_create].dup
+        floater = network.create_floating_ip(hsh[:floating_network_id], hsh)
+        floating_id = floater.body['floatingip']['id']
+        state[:hostname] = floater.body['floatingip']['floating_ip_address']
+        port = network.ports(:filters => { :device_id => server.id }).first
+        network.associate_floating_ip(floating_id, port.id)
       end
 
       def generate_name(base)
