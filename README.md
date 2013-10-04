@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TerryHowe/kitchen-fog.png?branch=master)](https://travis-ci.org/TerryHowe/kitchen-fog) [![Code Climate](https://codeclimate.com/github/TerryHowe/kitchen-fog.png)](https://codeclimate.com/github/TerryHowe/kitchen-fog)
+[![Build Status](https://travis-ci.org/TerryHowe/kitchen-fog.png?branch=master)](https://travis-ci.org/TerryHowe/kitchen-fog)
 
 # Kitchen::Fog
 
