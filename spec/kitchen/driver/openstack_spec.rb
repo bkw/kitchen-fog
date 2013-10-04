@@ -66,14 +66,12 @@ describe Kitchen::Driver::Fog do
     context 'overridden options' do
       let(:config) do
         {
-          :authentication =>
-          {
+          :authentication => {
             :openstack_tenant => 'that_one',
             :openstack_region => 'atlantis',
             :openstack_service_name => 'the_service',
           },
-          :server_create =>
-          {
+          :server_create => {
             :image_ref => '22',
             :flavor_ref => '33',
           },
@@ -117,15 +115,13 @@ describe Kitchen::Driver::Fog do
     context 'required options provided' do
       let(:config) do
         {
-          :authentication =>
-          {
+          :authentication => {
             :openstack_username => 'hello',
             :openstack_api_key => 'world',
             :openstack_auth_url => 'http:',
             :openstack_tenant => 'www'
           },
-          :server_create =>
-          {
+          :server_create => {
             :flavorRef => 101,
             :imageRef => 222
           }
@@ -230,8 +226,7 @@ describe Kitchen::Driver::Fog do
   describe '#compute' do
     let(:config) do
       {
-        :authentication =>
-        {
+        :authentication => {
           :openstack_username => 'monkey',
           :openstack_api_key => 'potato',
           :openstack_auth_url => 'http:',
@@ -251,7 +246,7 @@ describe Kitchen::Driver::Fog do
     end
 
     context 'only an API key provided' do
-      let(:config) { { :authentication => {:openstack_api_key => '1234' } } }
+      let(:config) { { :authentication => { :openstack_api_key => '1234' } } }
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
@@ -259,7 +254,9 @@ describe Kitchen::Driver::Fog do
     end
 
     context 'only a username provided' do
-      let(:config) { { :authentication => {:openstack_username => 'monkey' } } }
+      let(:config) do
+        { :authentication => { :openstack_username => 'monkey' } }
+      end
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
@@ -299,7 +296,7 @@ describe Kitchen::Driver::Fog do
       it 'creates the server using a compute connection' do
         state = {}
         expect(driver.send(:create_server, state)).to eq(server)
-        expect(state).to eq({:server_id => 'test222'})
+        expect(state).to eq({ :server_id => 'test222' })
       end
     end
 
@@ -317,7 +314,7 @@ describe Kitchen::Driver::Fog do
       it 'passes that public key path to Fog' do
         state = {}
         expect(driver.send(:create_server, state)).to eq(server)
-        expect(state).to eq({:server_id => 'test222'})
+        expect(state).to eq({ :server_id => 'test222' })
       end
     end
 
@@ -336,7 +333,7 @@ describe Kitchen::Driver::Fog do
       it 'passes that key name to Fog' do
         state = {}
         expect(driver.send(:create_server, state)).to eq(server)
-        expect(state).to eq({:server_id => 'test222'})
+        expect(state).to eq({ :server_id => 'test222' })
       end
     end
   end
