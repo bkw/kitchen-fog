@@ -39,7 +39,7 @@ module Kitchen
       def create(state)
         config[:name] ||= generate_name(instance.name)
         config[:disable_ssl_validation] and disable_ssl_validation
-        server = create_server
+        server = create_server(state)
         unless config[:floating_ip_create].nil?
           create_floating_ip(server)
         else
@@ -76,8 +76,9 @@ module Kitchen
         ::Fog::Network.new(authentication)
       end
 
-      def create_server
-        server_def = config[:server_create].dup
+      def create_server(state)
+        server_def = config[:server_create] || {}
+        server_def = server_def.dup
         server_def[:name] = config[:name]
         # Can't use the Fog bootstrap and/or setup methods here; they require a
         # public IP address that can't be guaranteed to exist across all

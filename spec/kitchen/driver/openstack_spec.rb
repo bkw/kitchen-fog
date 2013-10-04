@@ -40,6 +40,10 @@ describe Kitchen::Driver::Fog do
 
   describe '#initialize'do
     context 'default options' do
+      it 'defaults to no name' do
+        expect(driver[:name]).to eq(nil)
+      end
+
       it 'defaults to local user\'s SSH public key' do
         expect(driver[:public_key_path]).to eq(File.expand_path(
           '~/.ssh/id_dsa.pub'))
@@ -50,35 +54,33 @@ describe Kitchen::Driver::Fog do
         expect(driver[:port]).to eq('22')
       end
 
-      it 'defaults to no server name' do
-        expect(driver[:name]).to eq(nil)
+      it 'defaults to use ipv4' do
+        expect(driver[:use_ipv6]).to eq(false)
       end
 
-      it 'defaults to no tenant' do
-        expect(driver[:openstack_tenant]).to eq(nil)
-      end
-
-      it 'defaults to no region' do
-        expect(driver[:openstack_region]).to eq(nil)
-      end
-
-      it 'defaults to no service name' do
-        expect(driver[:openstack_service_name]).to eq(nil)
+      it 'defaults to no network name' do
+        expect(driver[:network_name]).to eq(nil)
       end
     end
 
     context 'overridden options' do
       let(:config) do
         {
-          :image_ref => '22',
-          :flavor_ref => '33',
+          :authentication =>
+          {
+            :openstack_tenant => 'that_one',
+            :openstack_region => 'atlantis',
+            :openstack_service_name => 'the_service',
+          },
+          :server_create =>
+          {
+            :image_ref => '22',
+            :flavor_ref => '33',
+          },
           :public_key_path => '/tmp',
           :username => 'admin',
           :port => '2222',
           :name => 'puppy',
-          :openstack_tenant => 'that_one',
-          :openstack_region => 'atlantis',
-          :openstack_service_name => 'the_service',
           :ssh_key => '/path/to/id_rsa'
         }
       end
@@ -115,21 +117,24 @@ describe Kitchen::Driver::Fog do
     context 'required options provided' do
       let(:config) do
         {
-          :openstack_username => 'hello',
-          :openstack_api_key => 'world',
-          :openstack_auth_url => 'http:',
-          :openstack_tenant => 'www'
+          :authentication =>
+          {
+            :openstack_username => 'hello',
+            :openstack_api_key => 'world',
+            :openstack_auth_url => 'http:',
+            :openstack_tenant => 'www'
+          },
+          :server_create =>
+          {
+            :flavorRef => 101,
+            :imageRef => 222
+          }
         }
       end
 
       it 'generates a server name in the absence of one' do
         driver.create(state)
         expect(driver[:name]).to eq('a_monkey!')
-      end
-
-      it 'gets a proper server ID' do
-        driver.create(state)
-        expect(state[:server_id]).to eq('test123')
       end
 
       it 'gets a proper hostname (IP)' do
@@ -225,25 +230,28 @@ describe Kitchen::Driver::Fog do
   describe '#compute' do
     let(:config) do
       {
-        :openstack_username => 'monkey',
-        :openstack_api_key => 'potato',
-        :openstack_auth_url => 'http:',
-        :openstack_tenant => 'link',
-        :openstack_region => 'ord',
-        :openstack_service_name => 'the_service'
+        :authentication =>
+        {
+          :openstack_username => 'monkey',
+          :openstack_api_key => 'potato',
+          :openstack_auth_url => 'http:',
+          :openstack_tenant => 'link',
+          :openstack_region => 'ord',
+          :openstack_service_name => 'the_service'
+        }
       }
     end
 
     context 'all requirements provided' do
       it 'creates a new compute connection' do
         Fog::Compute.stub(:new) { |arg| arg }
-        res = config.merge({ :provider => 'OpenStack' })
-        expect(driver.send(:compute)).to eq(res)
+        res = config.merge({ :provider => 'fog' })
+        expect(driver.send(:compute)).to eq(res[:authentication])
       end
     end
 
     context 'only an API key provided' do
-      let(:config) { { :openstack_api_key => '1234' } }
+      let(:config) { { :authentication => {:openstack_api_key => '1234' } } }
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
@@ -251,7 +259,7 @@ describe Kitchen::Driver::Fog do
     end
 
     context 'only a username provided' do
-      let(:config) { { :openstack_username => 'monkey' } }
+      let(:config) { { :authentication => {:openstack_username => 'monkey' } } }
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
@@ -268,9 +276,13 @@ describe Kitchen::Driver::Fog do
         :public_key_path => 'tarpals'
       }
     end
+    let(:server) do
+      double(:id => 'test222', :wait_for => true,
+        :public_ip_addresses => %w{1.2.3.4})
+    end
     let(:servers) do
       s = double('servers')
-      s.stub(:create) { |arg| arg }
+      s.stub(:create).and_return(server)
       s
     end
     let(:compute) { double(:servers => servers) }
@@ -285,7 +297,9 @@ describe Kitchen::Driver::Fog do
       before(:each) { @config = config.dup }
 
       it 'creates the server using a compute connection' do
-        expect(driver.send(:create_server)).to eq(@config)
+        state = {}
+        expect(driver.send(:create_server, state)).to eq(server)
+        expect(state).to eq({:server_id => 'test222'})
       end
     end
 
@@ -301,7 +315,9 @@ describe Kitchen::Driver::Fog do
       before(:each) { @config = config.dup }
 
       it 'passes that public key path to Fog' do
-        expect(driver.send(:create_server)).to eq(@config)
+        state = {}
+        expect(driver.send(:create_server, state)).to eq(server)
+        expect(state).to eq({:server_id => 'test222'})
       end
     end
 
@@ -318,7 +334,9 @@ describe Kitchen::Driver::Fog do
       before(:each) { @config = config.dup }
 
       it 'passes that key name to Fog' do
-        expect(driver.send(:create_server)).to eq(@config)
+        state = {}
+        expect(driver.send(:create_server, state)).to eq(server)
+        expect(state).to eq({:server_id => 'test222'})
       end
     end
   end
@@ -392,7 +410,7 @@ describe Kitchen::Driver::Fog do
     end
 
     context 'IPs in user-defined network group' do
-      let(:config) { { :openstack_network_name => 'mynetwork' } }
+      let(:config) { { :network_name => 'mynetwork' } }
       let(:addresses) do
         {
           'mynetwork' => [
