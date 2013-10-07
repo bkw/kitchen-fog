@@ -41,13 +41,13 @@ module Kitchen
         config[:disable_ssl_validation] and disable_ssl_validation
         server = create_server(state)
         unless config[:floating_ip_create].nil?
-          create_floating_ip(server)
+          create_floating_ip(server, state)
         else
           state[:hostname] = get_ip(server)
         end
         wait_for_sshd(state[:hostname]) ; puts '(ssh ready)'
-        unless config[:ssh_key] or config[:key_name]
-          do_ssh_setup(state, config, server)
+        if config[:upload_public_ssh_key]
+          upload_public_ssh_key(state, config, server)
         end
       rescue ::Fog::Errors::Error, Excon::Errors::Error => ex
         raise ActionFailed, ex.message
@@ -90,7 +90,7 @@ module Kitchen
         server
       end
 
-      def create_floating_ip(server)
+      def create_floating_ip(server, state)
         hsh = config[:floating_ip_create].dup
         floater = network.create_floating_ip(hsh[:floating_network_id], hsh)
         floating_id = floater.body['floatingip']['id']
@@ -147,7 +147,7 @@ module Kitchen
         return pub, priv
       end
 
-      def do_ssh_setup(state, config, server)
+      def upload_public_ssh_key(state, config, server)
         ssh = ::Fog::SSH.new(state[:hostname], config[:username],
           { :password => server.password })
         pub_key = open(config[:public_key_path]).read

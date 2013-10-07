@@ -40,7 +40,7 @@ Provide, at a minimum, the required driver options in your `.kitchen.yml` file. 
         flavor_id: '103'
         image_id: '8c096c29-a666-4b82-99c4-c77dc70cfb40'
         networks: [ '76abe0b1-581a-4698-b200-a2e890f4eb8d' ]
-      network: '76abe0b1-581a-4698-b200-a2e890f4eb8d'
+      network_name: '76abe0b1-581a-4698-b200-a2e890f4eb8d'
       require_chef_omnibus: latest (if you'll be using Chef)
 
 By default, a unique server name will be generated and the current user's SSH
@@ -49,10 +49,10 @@ options:
 
     name: [A UNIQUE SERVER NAME]
     ssh_key: [PATH TO YOUR PRIVATE SSH KEY]
+    upload_public_ssh_key: [TRUE UPLOADS PUBLIC KEY TO SERVER]
     public_key_path: [PATH TO YOUR SSH PUBLIC KEY]
     username: [SSH USER]
     port: [SSH PORT]
-    key_name: [SSH KEY NAME]
 
 If a key\_name is provided it will be used instead of any
 public\_key\_path that is specified.
