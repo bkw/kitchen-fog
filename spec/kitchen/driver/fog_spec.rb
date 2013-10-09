@@ -61,6 +61,10 @@ describe Kitchen::Driver::Fog do
       it 'defaults to no network name' do
         expect(driver[:network_name]).to eq(nil)
       end
+
+      it 'defaults to no upload_public_ssh_key' do
+        expect(driver[:upload_public_ssh_key]).to eq(false)
+      end
     end
 
     context 'overridden options' do
@@ -108,7 +112,7 @@ describe Kitchen::Driver::Fog do
       d.stub(:create_server).and_return(server)
       d.stub(:wait_for_sshd).with('1.2.3.4').and_return(true)
       d.stub(:get_ip).and_return('1.2.3.4')
-      d.stub(:do_ssh_setup).and_return(true)
+      d.stub(:upload_public_ssh_key).and_return(true)
       d
     end
 
@@ -557,7 +561,7 @@ describe Kitchen::Driver::Fog do
     end
   end
 
-  describe '#do_ssh_setup' do
+  describe '#upload_public_ssh_key' do
     let(:server) { double(:password => 'aloha') }
     let(:state) { { :hostname => 'host' } }
     let(:read) { double(:read => 'a_key') }
@@ -573,7 +577,7 @@ describe Kitchen::Driver::Fog do
       driver.stub(:open).with(File.expand_path(
         '~/.ssh/id_dsa.pub')).and_return(read)
       read.stub(:read).and_return('a_key')
-      res = driver.send(:do_ssh_setup, state, config, server)
+      res = driver.send(:upload_public_ssh_key, state, config, server)
       expected = [
         'mkdir .ssh',
         'echo "a_key" >> ~/.ssh/authorized_keys',

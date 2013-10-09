@@ -35,6 +35,7 @@ module Kitchen
       default_config :port, '22'
       default_config :use_ipv6, false
       default_config :network_name, nil
+      default_config :upload_public_ssh_key, false
 
       def create(state)
         config[:name] ||= generate_name(instance.name)
@@ -78,9 +79,9 @@ module Kitchen
 
       def convert_to_strings(objay)
         if objay.kind_of?(Array)
-          objay.map{ |v| convert_to_strings(v) }
+          objay.map { |v| convert_to_strings(v) }
         elsif objay.kind_of?(Hash)
-          Hash[objay.map{|(k,v)| [k.to_s, convert_to_strings(v)]}]
+          Hash[objay.map { |(k, v)| [k.to_s, convert_to_strings(v)] }]
         else
           objay
         end
