@@ -25,23 +25,26 @@ Or install it yourself as:
 
 Provide, at a minimum, the required driver options in your `.kitchen.yml` file.  The authentication and server_create sections are specific to the provider:
 
+    ---
     driver_plugin: fog
     driver_config:
       authentication:
-        provider: 'hp'
-        hp_access_key: 'username'
-        hp_secret_key: 'password'
-        hp_auth_uri: 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
-        hp_tenant_id: 'project/tenant id'
-        hp_avl_zone: 'region-b.geo-1'
-        version: v2
-        hp_use_upass_auth_style: true
+        provider: 'openstack'
+        openstack_username: 'username'
+        openstack_api_key: 'password'
+        openstack_auth_url: 'https://id.example.com:35357/v2.0/tokens'
+        openstack_tenant: 'tenant_name'
+        openstack_region: 'region-b.geo-1'
       server_create:
-        flavor_id: '103'
-        image_id: '8c096c29-a666-4b82-99c4-c77dc70cfb40'
-        networks: [ '76abe0b1-581a-4698-b200-a2e890f4eb8d' ]
-      network_name: '76abe0b1-581a-4698-b200-a2e890f4eb8d'
-      require_chef_omnibus: latest (if you'll be using Chef)
+        flavor_ref: '103'
+        image_ref: '8c096c29-a666-4b82-99c4-c77dc70cfb40'
+        key_name: 'bover'
+        nics: [ 'net_id': '76abe0b1-581a-4698-b200-a2e890f4eb8d' ]
+      floating_ip_create:
+        floating_network_id: '7da74520-9d5e-427b-a508-213c84e69616'
+      require_chef_omnibus: latest
+      public_key_path: /home/terry/.ssh/bover.pub
+      username: ubuntu
 
 By default, a unique server name will be generated and the current user's SSH
 key will be used, though that behavior can be overridden with additional
