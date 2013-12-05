@@ -61,6 +61,11 @@ module Kitchen
         server = compute.servers.get(state[:server_id])
         server.destroy unless server.nil?
         info "Fog instance <#{state[:server_id]}> destroyed."
+        unless config[:floating_ip_create].nil?
+          network.floating_ips.destroy(state[:floating_ip_id])
+          info "Fog released floating ip #{state[:hostname]} <#{state[:floating_ip_id]}>."
+          state.delete(:floating_ip_id)
+        end
         state.delete(:server_id)
         state.delete(:hostname)
       end
@@ -104,6 +109,8 @@ module Kitchen
         floater = network.floating_ips.create(hsh)
         floating_id = floater.id
         state[:hostname] = floater.floating_ip_address
+        state[:floating_ip_id] = floating_id
+        info "Fog floating ip #{state[:hostname]} <#{state[:floating_ip_id]}> created."
         port = network.ports(:filters => { :device_id => server.id }).first
         network.associate_floating_ip(floating_id, port.id)
       end
