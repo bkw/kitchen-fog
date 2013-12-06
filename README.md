@@ -26,8 +26,8 @@ Or install it yourself as:
 Provide, at a minimum, the required driver options in your `.kitchen.yml` file.  The authentication and server_create sections are specific to the provider:
 
     ---
-    driver_plugin: fog
-    driver_config:
+    driver:
+      name: fog
       authentication:
         provider: 'openstack'
         openstack_username: 'username'
