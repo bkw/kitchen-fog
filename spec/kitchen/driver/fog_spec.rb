@@ -41,29 +41,29 @@ describe Kitchen::Driver::Fog do
   describe '#initialize'do
     context 'default options' do
       it 'defaults to no name' do
-        expect(driver[:name]).to eq(nil)
+        driver[:name].should eq(nil)
       end
 
       it 'defaults to local user\'s SSH public key' do
-        expect(driver[:public_key_path]).to eq(File.expand_path(
+        driver[:public_key_path].should eq(File.expand_path(
           '~/.ssh/id_dsa.pub'))
       end
 
       it 'defaults to SSH with root user on port 22' do
-        expect(driver[:username]).to eq('root')
-        expect(driver[:port]).to eq('22')
+        driver[:username].should eq('root')
+        driver[:port].should eq('22')
       end
 
       it 'defaults to use ipv4' do
-        expect(driver[:use_ipv6]).to eq(false)
+        driver[:use_ipv6].should eq(false)
       end
 
       it 'defaults to no network name' do
-        expect(driver[:network_name]).to eq(nil)
+        driver[:network_name].should eq(nil)
       end
 
       it 'defaults to no upload_public_ssh_key' do
-        expect(driver[:upload_public_ssh_key]).to eq(false)
+        driver[:upload_public_ssh_key].should eq(false)
       end
     end
 
@@ -90,12 +90,12 @@ describe Kitchen::Driver::Fog do
       it 'uses all the overridden options' do
         drv = driver
         config.each do |k, v|
-          expect(drv[k]).to eq(v)
+          drv[k].should eq(v)
         end
       end
 
       it 'SSH with user-specified private key' do
-        expect(driver[:ssh_key]).to eq('/path/to/id_rsa')
+        driver[:ssh_key].should eq('/path/to/id_rsa')
       end
     end
   end
@@ -134,12 +134,12 @@ describe Kitchen::Driver::Fog do
 
       it 'generates a server name in the absence of one' do
         driver.create(state)
-        expect(driver[:name]).to eq('a_monkey!')
+        driver[:name].should eq('a_monkey!')
       end
 
       it 'gets a proper hostname (IP)' do
         driver.create(state)
-        expect(state[:hostname]).to eq('1.2.3.4')
+        state[:hostname].should eq('1.2.3.4')
       end
 
       it 'does not disable SSL validation' do
@@ -245,7 +245,7 @@ describe Kitchen::Driver::Fog do
       it 'creates a new compute connection' do
         Fog::Compute.stub(:new) { |arg| arg }
         res = config.merge({ :provider => 'fog' })
-        expect(driver.send(:compute)).to eq(res[:authentication])
+        driver.send(:compute).should eq(res[:authentication])
       end
     end
 
@@ -299,8 +299,8 @@ describe Kitchen::Driver::Fog do
 
       it 'creates the server using a compute connection' do
         state = {}
-        expect(driver.send(:create_server, state)).to eq(server)
-        expect(state).to eq({ :server_id => 'test222' })
+        driver.send(:create_server, state).should eq(server)
+        state.should eq({ :server_id => 'test222' })
       end
     end
 
@@ -317,8 +317,8 @@ describe Kitchen::Driver::Fog do
 
       it 'passes that public key path to Fog' do
         state = {}
-        expect(driver.send(:create_server, state)).to eq(server)
-        expect(state).to eq({ :server_id => 'test222' })
+        driver.send(:create_server, state).should eq(server)
+        state.should eq({ :server_id => 'test222' })
       end
     end
 
@@ -336,8 +336,8 @@ describe Kitchen::Driver::Fog do
 
       it 'passes that key name to Fog' do
         state = {}
-        expect(driver.send(:create_server, state)).to eq(server)
-        expect(state).to eq({ :server_id => 'test222' })
+        driver.send(:create_server, state).should eq(server)
+        state.should eq({ :server_id => 'test222' })
       end
     end
   end
@@ -349,7 +349,7 @@ describe Kitchen::Driver::Fog do
     end
 
     it 'generates a name' do
-      expect(driver.send(:generate_name, 'monkey')).to match(
+      driver.send(:generate_name, 'monkey').should match(
         /^monkey-user-host-/)
     end
 
@@ -360,7 +360,7 @@ describe Kitchen::Driver::Fog do
       end
 
       it 'limits the generated name to 64-characters' do
-        expect(driver.send(:generate_name, 'long').length).to eq(64)
+        driver.send(:generate_name, 'long').length.should eq(64)
       end
     end
   end
@@ -388,7 +388,7 @@ describe Kitchen::Driver::Fog do
       let(:parsed_ips) { [%w{1.2.3.4}, %w{5.5.5.5}] }
 
       it 'returns a public IPv4 address' do
-        expect(driver.send(:get_ip, server)).to eq('1.2.3.4')
+        driver.send(:get_ip, server).should eq('1.2.3.4')
       end
     end
 
@@ -397,7 +397,7 @@ describe Kitchen::Driver::Fog do
       let(:parsed_ips) { [%w{4.3.2.1}, []] }
 
       it 'returns a public IPv4 address' do
-        expect(driver.send(:get_ip, server)).to eq('4.3.2.1')
+        driver.send(:get_ip, server).should eq('4.3.2.1')
       end
     end
 
@@ -406,7 +406,7 @@ describe Kitchen::Driver::Fog do
       let(:parsed_ips) { [[], %w{5.5.5.5}] }
 
       it 'returns a private IPv4 address' do
-        expect(driver.send(:get_ip, server)).to eq('5.5.5.5')
+        driver.send(:get_ip, server).should eq('5.5.5.5')
       end
     end
 
@@ -422,7 +422,7 @@ describe Kitchen::Driver::Fog do
       end
 
       it 'returns a IPv4 address in user-defined network group' do
-        expect(driver.send(:get_ip, server)).to eq('7.7.7.7')
+        driver.send(:get_ip, server).should eq('7.7.7.7')
       end
     end
 
@@ -447,7 +447,7 @@ describe Kitchen::Driver::Fog do
         let(:parsed_ips) { [%w{6.6.6.6 7.7.7.7}, %w{8.8.8.8 9.9.9.9}] }
 
         it 'selects the first public IP' do
-          expect(driver.send(:get_ip, server)).to eq('6.6.6.6')
+          driver.send(:get_ip, server).should eq('6.6.6.6')
         end
       end
 
@@ -458,7 +458,7 @@ describe Kitchen::Driver::Fog do
         let(:parsed_ips) { [%w{6.6.6.6 7.7.7.7}, []] }
 
         it 'selects the first public IP' do
-          expect(driver.send(:get_ip, server)).to eq('6.6.6.6')
+          driver.send(:get_ip, server).should eq('6.6.6.6')
         end
       end
 
@@ -469,7 +469,7 @@ describe Kitchen::Driver::Fog do
         let(:parsed_ips) { [[], %w{8.8.8.8 9.9.9.9}] }
 
         it 'selects the first private IP' do
-          expect(driver.send(:get_ip, server)).to eq('8.8.8.8')
+          driver.send(:get_ip, server).should eq('8.8.8.8')
         end
       end
     end
@@ -492,7 +492,7 @@ describe Kitchen::Driver::Fog do
     context 'both public and private IPs' do
       context 'IPv4 (default)' do
         it 'returns only the v4 IPs' do
-          expect(driver.send(:parse_ips, pub, priv)).to eq([pub_v4, priv_v4])
+          driver.send(:parse_ips, pub, priv).should eq([pub_v4, priv_v4])
         end
       end
 
@@ -500,7 +500,7 @@ describe Kitchen::Driver::Fog do
         let(:config) { { :use_ipv6 => true } }
 
         it 'returns only the v6 IPs' do
-          expect(driver.send(:parse_ips, pub, priv)).to eq([pub_v6, priv_v6])
+          driver.send(:parse_ips, pub, priv).should eq([pub_v6, priv_v6])
         end
       end
     end
@@ -510,7 +510,7 @@ describe Kitchen::Driver::Fog do
 
       context 'IPv4 (default)' do
         it 'returns only the v4 IPs' do
-          expect(driver.send(:parse_ips, pub, priv)).to eq([pub_v4, []])
+          driver.send(:parse_ips, pub, priv).should eq([pub_v4, []])
         end
       end
 
@@ -518,7 +518,7 @@ describe Kitchen::Driver::Fog do
         let(:config) { { :use_ipv6 => true } }
 
         it 'returns only the v6 IPs' do
-          expect(driver.send(:parse_ips, pub, priv)).to eq([pub_v6, []])
+          driver.send(:parse_ips, pub, priv).should eq([pub_v6, []])
         end
       end
     end
@@ -528,7 +528,7 @@ describe Kitchen::Driver::Fog do
 
       context 'IPv4 (default)' do
         it 'returns only the v4 IPs' do
-          expect(driver.send(:parse_ips, pub, priv)).to eq([[], priv_v4])
+          driver.send(:parse_ips, pub, priv).should eq([[], priv_v4])
         end
       end
 
@@ -536,7 +536,7 @@ describe Kitchen::Driver::Fog do
         let(:config) { { :use_ipv6 => true } }
 
         it 'returns only the v6 IPs' do
-          expect(driver.send(:parse_ips, pub, priv)).to eq([[], priv_v6])
+          driver.send(:parse_ips, pub, priv).should eq([[], priv_v6])
         end
       end
     end
@@ -547,7 +547,7 @@ describe Kitchen::Driver::Fog do
 
       context 'IPv4 (default)' do
         it 'returns empty lists' do
-          expect(driver.send(:parse_ips, pub, priv)).to eq([[], []])
+          driver.send(:parse_ips, pub, priv).should eq([[], []])
         end
       end
 
@@ -555,7 +555,7 @@ describe Kitchen::Driver::Fog do
         let(:config) { { :use_ipv6 => true } }
 
         it 'returns empty lists' do
-          expect(driver.send(:parse_ips, nil, nil)).to eq([[], []])
+          driver.send(:parse_ips, nil, nil).should eq([[], []])
         end
       end
     end
@@ -583,13 +583,13 @@ describe Kitchen::Driver::Fog do
         'echo "a_key" >> ~/.ssh/authorized_keys',
         'passwd -l root'
       ]
-      expect(res).to eq(expected)
+      res.should eq(expected)
     end
   end
 
   describe '#disable_ssl_validation' do
     it 'turns off Excon SSL cert validation' do
-      expect(driver.send(:disable_ssl_validation)).to eq(false)
+      driver.send(:disable_ssl_validation).should eq(false)
     end
   end
 end
